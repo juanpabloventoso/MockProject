@@ -23,10 +23,12 @@ namespace MockProject.Common
             _DbContext = DbContext;
         }
 
-        public async Task<int> GetUserIDByEmail(string Email)
+        public async Task<int?> GetUserIDByEmail(string Email)
         {
             var User = await _DbContext.Users.Where(x => x.Email.Equals(Email)).FirstOrDefaultAsync();
-            return User.ID;
+            if (User != null)
+                return User.ID;
+            return null;
         }
 
     }
