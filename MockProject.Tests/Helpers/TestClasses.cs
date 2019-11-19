@@ -43,9 +43,9 @@ namespace MockProject.Tests.Helpers.TestClasses
             return new TestAsyncEnumerable<TResult>(expression);
         }
 
-        public Task<TResult> ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
+        public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            return Task.FromResult(Execute<TResult>(expression));
+            return Execute<TResult>(expression);
         }
     }
 
@@ -59,6 +59,11 @@ namespace MockProject.Tests.Helpers.TestClasses
         public TestAsyncEnumerable(Expression expression)
             : base(expression)
         { }
+
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken)
+        {
+            return GetEnumerator();
+        }
 
         public IAsyncEnumerator<T> GetEnumerator()
         {
@@ -81,9 +86,10 @@ namespace MockProject.Tests.Helpers.TestClasses
             _inner = inner;
         }
 
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
             _inner.Dispose();
+            return new ValueTask();
         }
 
         public T Current
@@ -94,9 +100,9 @@ namespace MockProject.Tests.Helpers.TestClasses
             }
         }
 
-        public Task<bool> MoveNext(CancellationToken cancellationToken)
+        public ValueTask<bool> MoveNextAsync()
         {
-            return Task.FromResult(_inner.MoveNext());
+            return new ValueTask<bool>(_inner.MoveNext());
         }
     }
 
