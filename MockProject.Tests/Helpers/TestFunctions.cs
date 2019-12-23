@@ -20,6 +20,7 @@ namespace MockProject.Tests.Helpers
             MockSet.As<IQueryable<T>>().Setup(x => x.Expression).Returns(TestData.Expression);
             MockSet.As<IQueryable<T>>().Setup(x => x.ElementType).Returns(TestData.ElementType);
             MockSet.As<IQueryable<T>>().Setup(x => x.GetEnumerator()).Returns(TestData.GetEnumerator());
+            MockSet.As<IEnumerable<T>>().Setup(x => x.GetEnumerator()).Returns(TestData.GetEnumerator());
             return MockSet;
         }
 

@@ -43,9 +43,26 @@ namespace MockProject.Tests.Helpers.TestClasses
             return new TestAsyncEnumerable<TResult>(expression);
         }
 
+		//
+        // Approach from MockQueryable by romantitov https://github.com/romantitov
+		// (https://github.com/romantitov/MockQueryable/blob/master/src/MockQueryable/MockQueryable/TestAsyncEnumerable.cs#L59-L73)
+		//
+		// (Thanks https://github.com/SuricateCan for your suggestion!)
+		//
         public TResult ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            return Execute<TResult>(expression);
+            var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            var executionResult = typeof(IQueryProvider)
+                .GetMethod(
+                    name: nameof(IQueryProvider.Execute),
+                    genericParameterCount: 1,
+                    types: new[] { typeof(Expression) })
+                .MakeGenericMethod(expectedResultType)
+                .Invoke(this, new[] { expression });
+
+            return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
+                .MakeGenericMethod(expectedResultType)
+                .Invoke(null, new[] { executionResult });
         }
     }
 
